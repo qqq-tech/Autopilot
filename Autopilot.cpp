@@ -204,8 +204,5 @@ float pitch_controller::i_component()
 
 float pitch_controller::d_component()
 {
-	//previous_scaler
-	//scaler_output
-	
-	return kd;
+	return kd * (error - previousError) / sample_time_actual;
 }
