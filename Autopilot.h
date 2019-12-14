@@ -30,27 +30,27 @@ public:
 
 
 
-	void begin(float setpoint_,     // Degrees
-	           int maxRate_up_,     // Degrees per Sec
-	           int maxRate_down_,   // Degrees per Sec
-	           float kp_,           // Unitless
-	           float ki_,           // Unitless
-	           float kd_,           // Unitless
-	           float roll_comp_,    // Unitless
-	           float sampleRate_,   // Hz
-	           int servoMax_,       // ms pulswidth
-	           int servoMin_);      // ms pulswidth
+	void begin(float setpoint_,    // Degrees
+	           int maxRate_up_,    // Degrees per Sec
+	           int maxRate_down_,  // Degrees per Sec
+	           float kp_,          // Unitless
+	           float ki_,          // Unitless
+	           float kd_,          // Unitless
+	           float roll_comp_,   // Unitless
+	           float sampleRate_,  // Hz
+	           int servoMax_,      // ms pulswidth
+	           int servoMin_);     // ms pulswidth
 
-	void update(float setpoint_,     // Degrees
-	            int maxRate_up_,     // Degrees per Sec
-	            int maxRate_down_,   // Degrees per Sec
-	            float kp_,           // Unitless
-	            float ki_,           // Unitless
-	            float kd_,           // Unitless
-	            float roll_comp_,    // Unitless
-	            float sampleRate_,   // Hz
-	            int servoMax_,       // ms pulswidth
-	            int servoMin_);      // ms pulswidth
+	void update(float setpoint_,    // Degrees
+	            int maxRate_up_,    // Degrees per Sec
+	            int maxRate_down_,  // Degrees per Sec
+	            float kp_,          // Unitless
+	            float ki_,          // Unitless
+	            float kd_,          // Unitless
+	            float roll_comp_,   // Unitless
+	            float sampleRate_,  // Hz
+	            int servoMax_,      // ms pulswidth
+	            int servoMin_);     // ms pulswidth
 
 	float compute(float pitchAngle, // Degrees
 	              float rollAngle,  // Degrees
@@ -97,9 +97,9 @@ private:
 
 
 
-	unsigned long sampleTimer_previous = millis();
-	unsigned long sampleTimer_current  = millis();
-	unsigned long sample_time_actual   = millis();
+	unsigned long sampleTimer_previous = 0;
+	unsigned long sampleTimer_current  = 0;
+	unsigned long sample_time_actual   = 0;
 
 	unsigned int samplePeriod_ms;
 	float samplePeriod_s;
