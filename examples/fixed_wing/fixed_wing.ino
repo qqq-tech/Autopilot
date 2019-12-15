@@ -91,7 +91,7 @@ bool getFeedback()
   {
     pitch = ((int16_t)(feedback.rxBuff[0] << 8) | feedback.rxBuff[1]) / 350.0;
     roll  = ((int16_t)(feedback.rxBuff[2] << 8) | feedback.rxBuff[3]) / 350.0;
-    ias   = ((int16_t)(feedback.rxBuff[4] << 8) | feedback.rxBuff[5]);
+    ias   = ((int16_t)(feedback.rxBuff[4] << 8) | feedback.rxBuff[5]) / 1000.0;
 
     return true;
   }
@@ -113,6 +113,3 @@ void sendJoyCommands()
   Joystick.Zrotate(pilot_throttle); //throttle
   Joystick.hat(-1);                 //hat
 }
-
-
-
