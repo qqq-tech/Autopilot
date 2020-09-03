@@ -3,14 +3,14 @@
 
 
 
-float roll_controller::compute(const state_params& state)
+float ias_controller::compute(const state_params& state)
 {
 	float controllerOutput;
 
 	if (timer.fire())
 	{
 		previousError = error;
-		error = setpoint - state.roll;
+		error = setpoint - state.ias;
 
 		p_val = constrain(p_component(), -(10 * (long)samplePeriod_ms), 10 * (long)samplePeriod_ms);
 		i_val = i_component();

@@ -3,7 +3,7 @@
 
 
 
-float altitude_controller::compute(state_params state)
+float altitude_controller::compute(const state_params& state)
 {
 	float controllerOutput;
 

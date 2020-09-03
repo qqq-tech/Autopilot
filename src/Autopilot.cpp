@@ -3,7 +3,7 @@
 
 
 
-float float_constrain(float input, float min, float max)
+float float_constrain(const float& input, const float& min, const float& max)
 {
 	if (input > max)
 		return max;
@@ -16,7 +16,7 @@ float float_constrain(float input, float min, float max)
 
 
 
-float float_map(float x, float in_min, float in_max, float out_min, float out_max)
+float float_map(const float& x, const float& in_min, const float& in_max, const float& out_min, const float& out_max)
 {
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -24,16 +24,58 @@ float float_map(float x, float in_min, float in_max, float out_min, float out_ma
 
 
 
-int centiDeg_to_us(int controller_output_, int outputMin_, int outputMax_)
+float find_heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2)
 {
-	// Map high is 18000 (180 * 100) since controller_output is in centi-degrees
-	return (int)float_constrain(float_map(controller_output_, 0, 18000, outputMin_, outputMax_), outputMin_, outputMax_);
+	float deltaLon_r = radians(lon_2 - lon_1);
+	float lat_1_r = radians(lat_1);
+	float lat_2_r = radians(lat_2);
+
+	float x = cos(lat_2_r) * sin(deltaLon_r);
+	float y = cos(lat_1_r) * sin(lat_2_r) - sin(lat_1_r) * cos(lat_2_r) * cos(deltaLon_r);
+
+	return fmod((degrees(atan2(x, y)) + 360), 360);
 }
 
 
 
 
-void basic_controller::begin(control_params params)
+float find_distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2)
+{
+	float lat_1_r = radians(lat_1);
+	float lon_1_r = radians(lon_1);
+	float lat_2_r = radians(lat_2);
+	float lon_2_r = radians(lon_2);
+
+	float deltaLat_r = lat_2_r - lat_1_r;
+	float deltaLon_r = lon_2_r - lon_1_r;
+
+	float a = (sin(deltaLat_r / 2) * sin(deltaLat_r / 2)) + cos(lat_1_r) * cos(lat_2_r) * (sin(deltaLon_r / 2)) * (sin(deltaLon_r / 2));
+
+	return 2 * EARTH_RADIUS_KM * atan2(sqrt(a), sqrt(1 - a));
+}
+
+
+
+
+void find_coord(const float& lat_1, const float& lon_1, float& lat_2, float& lon_2, const float& distance, const float& bearing)
+{
+	float bearing_r = radians(bearing);
+	float adj_dist = distance / EARTH_RADIUS_KM;
+
+	float lat_1_r = radians(lat_1);
+	float lon_1_r = radians(lon_1);
+
+	lat_2 = asin(sin(lat_1_r) * cos(adj_dist) + cos(lat_1_r) * sin(adj_dist) * cos(bearing_r));
+	lon_2 = lon_1_r + atan2(sin(bearing_r) * sin(adj_dist) * cos(lat_1_r), cos(adj_dist) - sin(lat_1_r) * sin(lat_2));
+
+	lat_2 = degrees(lat_2);
+	lon_2 = degrees(lon_2);
+}
+
+
+
+
+void basic_controller::begin(const control_params& params)
 {
 	update(params);
 	reset();
@@ -42,7 +84,7 @@ void basic_controller::begin(control_params params)
 
 
 
-void basic_controller::update(control_params params)
+void basic_controller::update(const control_params& params)
 {
 	setpoint = params.setpoint;
 	samplePeriod_s = 1 / float_constrain(params.sampleRate, MIN_F, MAX_F);

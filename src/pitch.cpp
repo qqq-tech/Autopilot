@@ -3,7 +3,7 @@
 
 
 
-float pitch_controller::compute(state_params state)
+float pitch_controller::compute(const state_params& state)
 {
 	float controllerOutput;
 
@@ -31,7 +31,7 @@ float pitch_controller::compute(state_params state)
 
 
 
-float pitch_controller::roll_compensation(float controllerOutput, state_params state)
+float pitch_controller::roll_compensation(const float& controllerOutput, const state_params& state)
 {
 	return controllerOutput * abs(sin(radians(state.roll)));
 }

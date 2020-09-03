@@ -5,6 +5,8 @@
 
 
 
+const float EARTH_RADIUS_KM = 6378.137;
+
 const int MAX_F = 20;
 const int MIN_F = 1;
 
@@ -23,8 +25,11 @@ const int MIN_I_LIMIT = 0;
 
 
 
-float float_constrain(float input, float min, float max);
-float float_map(float x, float in_min, float in_max, float out_min, float out_max);
+float float_constrain(const float& input, const float& min, const float& max);
+float float_map(const float& x, const float& in_min, const float& in_max, const float& out_min, const float& out_max);
+float find_heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
+float find_distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
+void find_coord(const float& lat, const float& lon, float& lat_2, float& lon_2, const float& distance, const float& bearing);
 
 
 
@@ -40,13 +45,13 @@ struct control_params {
 };
 
 struct state_params {
-	float pitch;
 	float roll;
+	float pitch;
 	float hdg;
 	float alt;
-	float ias;
 	float lat;
 	float lon;
+	float ias;
 	float flaps;
 	float gear;
 };
@@ -68,10 +73,10 @@ public:
 
 
 
-	void begin(control_params params);
-	void update(control_params params);
+	void begin(const control_params& params);
+	void update(const control_params& params);
 	void reset();
-	virtual float compute(state_params state) = 0;
+	virtual float compute(const state_params& state) = 0;
 	
 	float get_P_Component();
 	float get_I_Component();
@@ -113,7 +118,7 @@ protected:
 class pitch_controller : public basic_controller
 {
 public:
-	float compute(state_params state);
+	float compute(const state_params& state);
 
 
 
@@ -124,7 +129,7 @@ private:
 
 
 	
-	float roll_compensation(float controllerOutput, state_params state);
+	float roll_compensation(const float& controllerOutput, const state_params& state);
 };
 
 
@@ -133,7 +138,7 @@ private:
 class roll_controller : public basic_controller
 {
 public:
-	float compute(state_params state);
+	float compute(const state_params& state);
 };
 
 
@@ -142,7 +147,13 @@ public:
 class heading_controller : public basic_controller
 {
 public:
-	float compute(state_params state);
+	float compute(const state_params& state);
+
+
+
+
+private:
+	float inputScrub(const state_params& state);
 };
 
 
@@ -151,6 +162,15 @@ public:
 class altitude_controller : public basic_controller
 {
 public:
-	float compute(state_params state);
+	float compute(const state_params& state);
+};
+
+
+
+
+class ias_controller : public basic_controller
+{
+public:
+	float compute(const state_params& state);
 };
 
