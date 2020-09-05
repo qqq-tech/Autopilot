@@ -10,17 +10,17 @@ const float EARTH_RADIUS_KM = 6378.137;
 const int MAX_F = 20;
 const int MIN_F = 1;
 
-const float MAX_P = 10000;
+const float MAX_P = 100;
 const float MIN_P = 0.1;
 
-const float MAX_I = 100000;
+const float MAX_I = 1000;
 const float MIN_I = 0.0;
 
-const float MAX_D = 10000;
+const float MAX_D = 100;
 const float MIN_D = 0.0;
 
-const int MAX_I_LIMIT = 4500;
-const int MIN_I_LIMIT = 0;
+const int MAX_I_LIMIT = 45;
+const int MIN_I_LIMIT = 0.0;
 
 
 
@@ -51,6 +51,14 @@ struct state_params {
 	float alt;
 	float lat;
 	float lon;
+	float UTC_year;
+	float UTC_month;
+	float UTC_day;
+	float UTC_hour;
+	float UTC_minute;
+	float UTC_second;
+	float sog;
+	float cog;
 	float ias;
 	float flaps;
 	float gear;
