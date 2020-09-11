@@ -12,7 +12,7 @@ float altitude_controller::compute(const state_params& state)
 		previousError = error;
 		error = setpoint - state.alt;
 
-		p_val = constrain(p_component(), -(10 * (long)samplePeriod_ms), 10 * (long)samplePeriod_ms);
+		p_val = p_component();
 		i_val = i_component();
 		d_val = d_component();
 
@@ -39,7 +39,7 @@ float altitude_controller::compute(const pilsim_state_params& state)
 		previousError = error;
 		error = setpoint - state.alt;
 
-		p_val = constrain(p_component(), -(10 * (long)samplePeriod_ms), 10 * (long)samplePeriod_ms);
+		p_val = p_component();
 		i_val = i_component();
 		d_val = d_component();
 

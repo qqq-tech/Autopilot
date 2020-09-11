@@ -12,7 +12,7 @@ float pitch_controller::compute(const state_params& state)
 		previousError = error;
 		error = setpoint - state.pitch;
 
-		p_val = float_constrain(p_component(), -(10 * (long)samplePeriod_ms), 10 * (long)samplePeriod_ms); // clip the p-component if it becomes comically large
+		p_val = p_component();
 		i_val = i_component();
 		d_val = d_component();
 
@@ -40,7 +40,7 @@ float pitch_controller::compute(const pilsim_state_params& state)
 		previousError = error;
 		error = setpoint - state.pitch;
 
-		p_val = float_constrain(p_component(), -(10 * (long)samplePeriod_ms), 10 * (long)samplePeriod_ms); // clip the p-component if it becomes comically large
+		p_val = p_component();
 		i_val = i_component();
 		d_val = d_component();
 
