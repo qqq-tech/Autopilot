@@ -44,24 +44,60 @@ struct control_params {
 	float outputMin;  // Unitless
 };
 
-struct state_params {
+struct pilsim_state_params {
 	float roll;
 	float pitch;
 	float hdg;
 	float alt;
 	float lat;
 	float lon;
-	float UTC_year;
-	float UTC_month;
-	float UTC_day;
-	float UTC_hour;
-	float UTC_minute;
-	float UTC_second;
-	float sog;
-	float cog;
 	float ias;
 	float flaps;
 	float gear;
+	float use_waypoints;
+	float next_lat;
+	float next_lon;
+	float next_hdg;
+	float next_alt;
+	float next_ias;
+};
+
+struct state_params {
+	float roll;
+	float pitch;
+
+	float hdg;
+	float hdg_comp;
+	float hdg_imu;
+
+	float cog;
+	float cog_gps;
+	float cog_gps_calc;
+
+	float alt;
+	float alt_gps;
+	float alt_baro;
+	float alt_lidar;
+
+	float lat;
+	float lon;
+	float prev_lat;
+	float prev_lon;
+
+	uint16_t UTC_year;
+	uint8_t UTC_month;
+	uint8_t UTC_day;
+	uint8_t UTC_hour;
+	uint8_t UTC_minute;
+	uint8_t UTC_second;
+
+	float ias;
+	float ias_pitot;
+	float ias_gps;
+	float ias_gps_calc;
+
+	bool flaps;
+	bool gear;
 };
 
 
@@ -85,6 +121,7 @@ public:
 	void update(const control_params& params);
 	void reset();
 	virtual float compute(const state_params& state) = 0;
+	virtual float compute(const pilsim_state_params& state) = 0;
 	
 	float get_P_Component();
 	float get_I_Component();
@@ -127,6 +164,7 @@ class pitch_controller : public basic_controller
 {
 public:
 	float compute(const state_params& state);
+	float compute(const pilsim_state_params& state);
 
 
 
@@ -138,6 +176,7 @@ private:
 
 	
 	float roll_compensation(const float& controllerOutput, const state_params& state);
+	float roll_compensation(const float& controllerOutput, const pilsim_state_params& state);
 };
 
 
@@ -147,6 +186,7 @@ class roll_controller : public basic_controller
 {
 public:
 	float compute(const state_params& state);
+	float compute(const pilsim_state_params& state);
 };
 
 
@@ -156,12 +196,14 @@ class heading_controller : public basic_controller
 {
 public:
 	float compute(const state_params& state);
+	float compute(const pilsim_state_params& state);
 
 
 
 
 private:
 	float inputScrub(const state_params& state);
+	float inputScrub(const pilsim_state_params& state);
 };
 
 
@@ -171,6 +213,7 @@ class altitude_controller : public basic_controller
 {
 public:
 	float compute(const state_params& state);
+	float compute(const pilsim_state_params& state);
 };
 
 
@@ -180,5 +223,6 @@ class ias_controller : public basic_controller
 {
 public:
 	float compute(const state_params& state);
+	float compute(const pilsim_state_params& state);
 };
 
