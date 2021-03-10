@@ -54,12 +54,6 @@ struct pilsim_state_params {
 	float ias;
 	float flaps;
 	float gear;
-	float use_waypoints;
-	float next_lat;
-	float next_lon;
-	float next_hdg;
-	float next_alt;
-	float next_ias;
 };
 
 struct state_params {
