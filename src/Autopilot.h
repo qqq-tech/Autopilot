@@ -5,7 +5,9 @@
 
 
 
-const float EARTH_RADIUS_KM = 6378.137;
+const float EARTH_RADIUS_M  = 6378100.0;
+const float EARTH_RADIUS_KM = EARTH_RADIUS_M / 1000;
+const float EARTH_GRAVITY   = 9.80665;
 
 const int MAX_F = 20;
 const int MIN_F = 1;
@@ -25,11 +27,12 @@ const int MIN_I_LIMIT = 0.0;
 
 
 
+float slope(const float& xi, const float& yi, const float& xf, const float& yf);
 float float_constrain(const float& input, const float& min, const float& max);
 float float_map(const float& x, const float& in_min, const float& in_max, const float& out_min, const float& out_max);
-float find_heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
-float find_distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
-void find_coord(const float& lat, const float& lon, float& lat_2, float& lon_2, const float& distance, const float& bearing);
+float heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
+float distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2, const bool& km = false);
+void coord(const float& lat, const float& lon, float& lat_2, float& lon_2, const float& distance, const float& bearing, const bool& km = false);
 
 
 
@@ -94,6 +97,43 @@ struct state_params {
 	bool gear;
 };
 
+struct point {
+	float maxRoll;    // °
+	float minTurnRad; // m
+	float hdgAngRate; // °/s
+	float hitRadius;  // m
+
+	float speed;   // Speed at point m/s
+	float heading; // Heading at point °
+	float lat;     // Point lat °
+	float lon;     // Point lon °
+
+	float rc_lat;  // Right Turn Circle lat °
+	float rc_lon;  // Right Turn Circle lon °
+	float lc_lat;  // Left Turn Circle lat °
+	float lc_lon;  // Left Turn Circle lon °
+	float c_lat;   // Selected Turn Circle lat °
+	float c_lon;   // Selected Turn Circle lon °
+	float e_lat;   // Enter/exit lat °
+	float e_lon;   // Enter/exit lon °
+};
+
+enum dubins {
+	LSR, // Left Straight Right
+	RSL, // Right Straight Left
+	RSR, // Right Straight Right
+	LSL  // Left Straight Left
+};
+
+struct nav_frame {
+	dubins path; // Dubins path type
+
+	float sps; // Straight Path Speed m/s
+
+	point ni; // Current point
+	point nf; // Next point
+};
+
 
 
 
@@ -139,7 +179,7 @@ protected:
 
 	float error = 0;
 	float previousError = 0;
-	float summedError = 0;
+	float summedError   = 0;
 
 	FireTimer timer;
 
@@ -220,3 +260,29 @@ public:
 	float compute(const pilsim_state_params& state);
 };
 
+
+
+
+class combined_controller
+{
+public:
+	pitch_controller    pitchController;
+	roll_controller     rollController;
+	heading_controller  headingController;
+	altitude_controller altitudeController;
+	ias_controller      iasController;
+
+	state_params state;
+	nav_frame    navFrame;
+
+
+
+
+	void processFrame();
+	void processFrame(nav_frame& frame);
+	void findHAR(point& curPoint); // Heading Angular Rate
+	void findMTR(point& curPoint); // Minimum Turn Radius
+	void findTurnCenters(point& curPoint);
+	void findPath(nav_frame& frame); 
+	void findEPts(nav_frame& frame); // Enter/Exit Point locations
+};

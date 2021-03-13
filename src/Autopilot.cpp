@@ -3,6 +3,14 @@
 
 
 
+float slope(const float& xi, const float& yi, const float& xf, const float& yf)
+{
+	return (yf - yi) / (xf - xi);
+}
+
+
+
+
 float float_constrain(const float& input, const float& min, const float& max)
 {
 	if (input > max)
@@ -24,7 +32,7 @@ float float_map(const float& x, const float& in_min, const float& in_max, const 
 
 
 
-float find_heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2)
+float heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2)
 {
 	float deltaLon_r = radians(lon_2 - lon_1);
 	float lat_1_r = radians(lat_1);
@@ -39,7 +47,7 @@ float find_heading(const float& lat_1, const float& lon_1, const float& lat_2, c
 
 
 
-float find_distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2)
+float distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2, const bool& km)
 {
 	float lat_1_r = radians(lat_1);
 	float lon_1_r = radians(lon_1);
@@ -51,16 +59,24 @@ float find_distance(const float& lat_1, const float& lon_1, const float& lat_2, 
 
 	float a = (sin(deltaLat_r / 2) * sin(deltaLat_r / 2)) + cos(lat_1_r) * cos(lat_2_r) * (sin(deltaLon_r / 2)) * (sin(deltaLon_r / 2));
 
-	return 2 * EARTH_RADIUS_KM * atan2(sqrt(a), sqrt(1 - a));
+	if (km)
+		return 2 * EARTH_RADIUS_KM * atan2(sqrt(a), sqrt(1 - a));
+	else
+		return 2 * EARTH_RADIUS_M * atan2(sqrt(a), sqrt(1 - a));
 }
 
 
 
 
-void find_coord(const float& lat_1, const float& lon_1, float& lat_2, float& lon_2, const float& distance, const float& bearing)
+void coord(const float& lat_1, const float& lon_1, float& lat_2, float& lon_2, const float& distance, const float& bearing, const bool& km)
 {
 	float bearing_r = radians(bearing);
-	float adj_dist = distance / EARTH_RADIUS_KM;
+	float adj_dist;
+	
+	if (km)
+		adj_dist = distance / EARTH_RADIUS_KM;
+	else
+		adj_dist = distance / EARTH_RADIUS_M;
 
 	float lat_1_r = radians(lat_1);
 	float lon_1_r = radians(lon_1);
