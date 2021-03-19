@@ -33,6 +33,10 @@ float float_map(const float& x, const float& in_min, const float& in_max, const 
 float heading(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2);
 float distance(const float& lat_1, const float& lon_1, const float& lat_2, const float& lon_2, const bool& km = false);
 void coord(const float& lat, const float& lon, float& lat_2, float& lon_2, const float& distance, const float& bearing, const bool& km = false);
+void toXY(const float& lat, const float& lon, float& x, float& y, const float& refLat = 0, const float& refLon = 0);
+float distXY(const float& x_1, const float& y_1, const float& x_2 = 0, const float& y_2 = 0);
+float hdgXY(const float& x_1, const float& y_1, const float& x_2, const float& y_2);
+void toDD(const float& x, const float& y, float& lat, float& lon, const float& refLat = 0, const float& refLon = 0);
 
 
 
@@ -48,38 +52,38 @@ struct control_params {
 };
 
 struct pilsim_state_params {
-	float roll;
-	float pitch;
-	float hdg;
-	float alt;
-	float lat;
-	float lon;
-	float ias;
-	float flaps;
-	float gear;
+	float roll;  // ° (+ = right, - = left)
+	float pitch; // ° (+ = up,    - = down)
+	float hdg;   // °
+	float alt;   // m
+	float lat;   // °
+	float lon;   // °
+	float ias;   // m/s
+	float flaps; // % (0% = up, 100% = down)
+	float gear;  // % (0% = up, 100% = down)
 };
 
 struct state_params {
-	float roll;
-	float pitch;
+	float roll;  // ° (+ = right, - = left)
+	float pitch; // ° (+ = up,    - = down)
 
-	float hdg;
-	float hdg_comp;
-	float hdg_imu;
+	float hdg;      // °
+	float hdg_comp; // °
+	float hdg_imu;  // °
 
-	float cog;
-	float cog_gps;
-	float cog_gps_calc;
+	float cog;          // °
+	float cog_gps;      // °
+	float cog_gps_calc; // °
 
-	float alt;
-	float alt_gps;
-	float alt_baro;
-	float alt_lidar;
+	float alt;       // m
+	float alt_gps;   // m
+	float alt_baro;  // m
+	float alt_lidar; // m
 
-	float lat;
-	float lon;
-	float prev_lat;
-	float prev_lon;
+	float lat;      // °
+	float lon;      // °
+	float prev_lat; // °
+	float prev_lon; // °
 
 	uint16_t UTC_year;
 	uint8_t UTC_month;
@@ -88,25 +92,25 @@ struct state_params {
 	uint8_t UTC_minute;
 	uint8_t UTC_second;
 
-	float ias;
-	float ias_pitot;
-	float ias_gps;
-	float ias_gps_calc;
+	float ias;          // m/s
+	float ias_pitot;    // m/s
+	float ias_gps;      // m/s
+	float ias_gps_calc; // m/s
 
-	bool flaps;
-	bool gear;
+	bool flaps; // 0 = up, 1 = down
+	bool gear;  // 0 = up, 1 = down
 };
 
 struct point {
 	float maxRoll;    // °
 	float minTurnRad; // m
-	float hdgAngRate; // °/s
 	float hitRadius;  // m
 
-	float speed;   // Speed at point m/s
-	float heading; // Heading at point °
-	float lat;     // Point lat °
-	float lon;     // Point lon °
+	float alt;     // m
+	float speed;   // m/s
+	float heading; // °
+	float lat;     // °
+	float lon;     // °
 
 	float rc_lat;  // Right Turn Circle lat °
 	float rc_lon;  // Right Turn Circle lon °
@@ -118,20 +122,28 @@ struct point {
 	float e_lon;   // Enter/exit lon °
 };
 
-enum dubins {
-	LSR, // Left Straight Right
-	RSL, // Right Straight Left
-	RSR, // Right Straight Right
-	LSL  // Left Straight Left
+enum dubin {
+	LSRU, // Left Straight Right Up
+	LSRD, // Left Straight Right Down
+	RSLU, // Right Straight Left Up
+	RSLD, // Right Straight Left Down
+	RSRU, // Right Straight Right Up
+	RSRD, // Right Straight Right Down
+	LSLU, // Left Straight Left Up
+	LSLD  // Left Straight Left Down
+};
+
+enum nav_state {
+	TURN_I,    // Initial turn
+	STRAIGHT,  // Straight
+	TURN_F,    // Final turn
+	DISENGAGED // Disengage dubins-styled navigation
 };
 
 struct nav_frame {
-	dubins path; // Dubins path type
-
-	float sps; // Straight Path Speed m/s
-
-	point ni; // Current point
-	point nf; // Next point
+	dubin path; // Dubins path type
+	point ni;   // Current point
+	point nf;   // Next point
 };
 
 
@@ -263,15 +275,9 @@ public:
 
 
 
-class combined_controller
+class navigator
 {
 public:
-	pitch_controller    pitchController;
-	roll_controller     rollController;
-	heading_controller  headingController;
-	altitude_controller altitudeController;
-	ias_controller      iasController;
-
 	state_params state;
 	nav_frame    navFrame;
 

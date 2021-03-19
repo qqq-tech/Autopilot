@@ -13,12 +13,12 @@ float slope(const float& xi, const float& yi, const float& xf, const float& yf)
 
 float float_constrain(const float& input, const float& min, const float& max)
 {
-	if (input > max)
-		return max;
-	else if (input < min)
-		return min;
-	else
-		return input;
+if (input > max)
+return max;
+else if (input < min)
+	return min;
+else
+return input;
 }
 
 
@@ -70,9 +70,9 @@ float distance(const float& lat_1, const float& lon_1, const float& lat_2, const
 
 void coord(const float& lat_1, const float& lon_1, float& lat_2, float& lon_2, const float& distance, const float& bearing, const bool& km)
 {
-	float bearing_r = radians(bearing);
+	float bearing_r = radians(fmod(bearing + 360, 360));
 	float adj_dist;
-	
+
 	if (km)
 		adj_dist = distance / EARTH_RADIUS_KM;
 	else
@@ -86,6 +86,42 @@ void coord(const float& lat_1, const float& lon_1, float& lat_2, float& lon_2, c
 
 	lat_2 = degrees(lat_2);
 	lon_2 = degrees(lon_2);
+}
+
+
+
+
+void toXY(const float& lat, const float& lon, float& x, float& y, const float& refLat, const float& refLon)
+{
+	float dist = distance(refLat, refLon, lat, lon);
+	float hdg = heading(refLat, refLon, lat, lon);
+
+	x = dist * cos(radians(hdg - 90));
+	y = dist * sin(radians(hdg - 90));
+}
+
+
+
+
+float distXY(const float& x_1, const float& y_1, const float& x_2, const float& y_2)
+{
+	return sqrt((x_1 * x_2) + (y_1 * y_2));
+}
+
+
+
+
+float hdgXY(const float& x_1, const float& y_1, const float& x_2, const float& y_2)
+{
+	return ((y_2 - y_1) / (x_2 - x_1));
+}
+
+
+
+
+void toDD(const float& x, const float& y, float& lat, float& lon, const float& refLat, const float& refLon)
+{
+	coord(refLat, refLon, lat, lon, distXY(x, y)); // Assuming 1 xy unit is 1m
 }
 
 
