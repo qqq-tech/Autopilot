@@ -3,27 +3,8 @@
 
 
 
-void navigator::processFrame()
-{
-	findMTR(navFrame.ni);
-	findMTR(navFrame.nf);
-
-	findTurnCenters(navFrame.ni);
-	findTurnCenters(navFrame.nf);
-
-	findPath(navFrame);
-
-	findEPts(navFrame);
-}
-
-
-
-
 void navigator::processFrame(nav_frame& frame)
 {
-	findHAR(frame.ni);
-	findHAR(frame.nf);
-
 	findMTR(frame.ni);
 	findMTR(frame.nf);
 
@@ -126,24 +107,79 @@ void navigator::findPath(nav_frame& frame)
 
 void navigator::findEPts(nav_frame& frame)
 {
-	float xi, yi, xf, yf, cxi, cyi, cxf, cyf;
-
-	toXY(frame.ni.lat,   frame.ni.lon,   xi,  yi,  frame.ni.lat, frame.ni.lon);
-	toXY(frame.ni.c_lat, frame.ni.c_lon, cxi, cyi, frame.ni.lat, frame.ni.lon);
-	toXY(frame.nf.lat,   frame.nf.lon,   xf,  yf,  frame.ni.lat, frame.ni.lon);
-	toXY(frame.nf.c_lat, frame.nf.c_lon, cxf, cyf, frame.ni.lat, frame.ni.lon);
+	float theta_i, theta_f, p0_lat, p0_lon, p1_lat, p1_lon, p2_lat, p2_lon, test_pt_dist, dist, stepSize;
 
 	if ((frame.path == LSRU) || (frame.path == LSRD))
 	{
+		theta_i = heading(frame.ni.c_lat, frame.ni.c_lon, frame.nf.c_lat, frame.nf.c_lon);
+		theta_f = fmod(theta_i + 180, 360);
 
+		coord(frame.ni.c_lat, frame.ni.c_lon, p0_lat, p0_lon, frame.ni.minTurnRad, theta_i);
+		coord(frame.nf.c_lat, frame.nf.c_lon, p2_lat, p2_lon, frame.nf.minTurnRad, theta_f);
+
+		test_pt_dist = distance(p0_lat, p0_lon, p2_lat, p2_lon);
+		coord(p0_lat, p0_lon, p1_lat, p1_lon, test_pt_dist, fmod(theta_i - 90, 360));
+
+		dist     = distance(p1_lat, p1_lon, p2_lat, p2_lon);
+		stepSize = 0.1; // °
+
+		while (dist > 1)
+		{
+			theta_i += stepSize;
+			theta_f = fmod(theta_i + 180, 360);
+
+			coord(frame.ni.c_lat, frame.ni.c_lon, p0_lat, p0_lon, frame.ni.minTurnRad, theta_i);
+			coord(frame.nf.c_lat, frame.nf.c_lon, p2_lat, p2_lon, frame.nf.minTurnRad, theta_f);
+
+			test_pt_dist = distance(p0_lat, p0_lon, p2_lat, p2_lon);
+			coord(p0_lat, p0_lon, p1_lat, p1_lon, test_pt_dist, fmod(theta_i - 90, 360));
+
+			dist = distance(p1_lat, p1_lon, p2_lat, p2_lon);
+		}
+
+		frame.ni.e_lat = p0_lat;
+		frame.ni.e_lon = p0_lon;
+
+		frame.nf.e_lat = p2_lat;
+		frame.nf.e_lon = p2_lon;
 	}
 	else if ((frame.path == RSLU) || (frame.path == RSLD))
 	{
+		theta_i = heading(frame.ni.c_lat, frame.ni.c_lon, frame.nf.c_lat, frame.nf.c_lon);
+		theta_f = fmod(theta_i + 180, 360);
 
+		coord(frame.ni.c_lat, frame.ni.c_lon, p0_lat, p0_lon, frame.ni.minTurnRad, theta_i);
+		coord(frame.nf.c_lat, frame.nf.c_lon, p2_lat, p2_lon, frame.nf.minTurnRad, theta_f);
+
+		test_pt_dist = distance(p0_lat, p0_lon, p2_lat, p2_lon);
+		coord(p0_lat, p0_lon, p1_lat, p1_lon, test_pt_dist, fmod(theta_i + 90, 360));
+
+		dist     = distance(p1_lat, p1_lon, p2_lat, p2_lon);
+		stepSize = 0.1; // °
+
+		while (dist > 1)
+		{
+			theta_i -= stepSize;
+			theta_f = fmod(theta_i + 180, 360);
+
+			coord(frame.ni.c_lat, frame.ni.c_lon, p0_lat, p0_lon, frame.ni.minTurnRad, theta_i);
+			coord(frame.nf.c_lat, frame.nf.c_lon, p2_lat, p2_lon, frame.nf.minTurnRad, theta_f);
+
+			test_pt_dist = distance(p0_lat, p0_lon, p2_lat, p2_lon);
+			coord(p0_lat, p0_lon, p1_lat, p1_lon, test_pt_dist, fmod(theta_i + 90, 360));
+
+			dist = distance(p1_lat, p1_lon, p2_lat, p2_lon);
+		}
+
+		frame.ni.e_lat = p0_lat;
+		frame.ni.e_lon = p0_lon;
+
+		frame.nf.e_lat = p2_lat;
+		frame.nf.e_lon = p2_lon;
 	}
 	else if ((frame.path == RSRU) || (frame.path == RSRD))
 	{
-
+		
 	}
 	else if ((frame.path == LSLU) || (frame.path == LSLD))
 	{
