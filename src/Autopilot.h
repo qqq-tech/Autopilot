@@ -134,14 +134,16 @@ enum dubin {
 };
 
 enum nav_state {
+	TAKEOFF,   // Takeoff roll
 	TURN_I,    // Initial turn
 	STRAIGHT,  // Straight
 	TURN_F,    // Final turn
-	DISENGAGED // Disengage dubins-styled navigation
+	FINAL,     // Final leg
+	DISENGAGED // Disengage dubin-styled navigation
 };
 
 struct nav_frame {
-	dubin path; // Dubins path type
+	dubin path; // Dubin path type
 	point ni;   // Current point
 	point nf;   // Next point
 };
@@ -278,13 +280,6 @@ public:
 class navigator
 {
 public:
-	state_params state;
-	nav_frame    navFrame;
-
-
-
-
-	void processFrame();
 	void processFrame(nav_frame& frame);
 	void findHAR(point& curPoint); // Heading Angular Rate
 	void findMTR(point& curPoint); // Minimum Turn Radius

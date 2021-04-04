@@ -13,12 +13,12 @@ float slope(const float& xi, const float& yi, const float& xf, const float& yf)
 
 float float_constrain(const float& input, const float& min, const float& max)
 {
-if (input > max)
-return max;
-else if (input < min)
-	return min;
-else
-return input;
+	if (input > max)
+		return max;
+	else if (input < min)
+		return min;
+	else
+		return input;
 }
 
 
@@ -121,7 +121,7 @@ float hdgXY(const float& x_1, const float& y_1, const float& x_2, const float& y
 
 void toDD(const float& x, const float& y, float& lat, float& lon, const float& refLat, const float& refLon)
 {
-	coord(refLat, refLon, lat, lon, distXY(x, y)); // Assuming 1 xy unit is 1m
+	coord(refLat, refLon, lat, lon, distXY(x, y), hdgXY(0, 0, x, y)); // Assuming 1 xy unit is 1m
 }
 
 
