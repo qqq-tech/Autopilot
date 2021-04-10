@@ -101,7 +101,7 @@ struct __attribute__((packed)) state_params {
 	bool gear;  // 0 = up, 1 = down
 };
 
-struct __attribute__((packed)) point {
+struct point {
 	float maxRoll;    // °
 	float minTurnRad; // m
 	float hitRadius;  // m
@@ -142,7 +142,7 @@ enum nav_state {
 	DISENGAGED // Disengage dubin-styled navigation
 };
 
-struct __attribute__((packed)) nav_frame {
+struct nav_frame {
 	dubin path; // Dubin path type
 	point ni;   // Current point
 	point nf;   // Next point
