@@ -41,7 +41,7 @@ void toDD(const float& x, const float& y, float& lat, float& lon, const float& r
 
 
 
-struct control_params {
+struct __attribute__((packed)) control_params {
 	float setpoint;   // Degrees
 	float kp;         // Unitless
 	float ki;         // Unitless
@@ -51,39 +51,39 @@ struct control_params {
 	float outputMin;  // Unitless
 };
 
-struct pilsim_state_params {
-	float roll;  // ° (+ = right, - = left)
-	float pitch; // ° (+ = up,    - = down)
-	float hdg;   // °
+struct __attribute__((packed)) pilsim_state_params {
+	float roll;  // Â° (+ = right, - = left)
+	float pitch; // Â° (+ = up,    - = down)
+	float hdg;   // Â°
 	float alt;   // m
-	float lat;   // °
-	float lon;   // °
+	float lat;   // Â°
+	float lon;   // Â°
 	float ias;   // m/s
 	float flaps; // % (0% = up, 100% = down)
 	float gear;  // % (0% = up, 100% = down)
 };
 
-struct state_params {
-	float roll;  // ° (+ = right, - = left)
-	float pitch; // ° (+ = up,    - = down)
+struct __attribute__((packed)) state_params {
+	float roll;  // Â° (+ = right, - = left)
+	float pitch; // Â° (+ = up,    - = down)
 
-	float hdg;      // °
-	float hdg_comp; // °
-	float hdg_imu;  // °
+	float hdg;      // Â°
+	float hdg_comp; // Â°
+	float hdg_imu;  // Â°
 
-	float cog;          // °
-	float cog_gps;      // °
-	float cog_gps_calc; // °
+	float cog;          // Â°
+	float cog_gps;      // Â°
+	float cog_gps_calc; // Â°
 
 	float alt;       // m
 	float alt_gps;   // m
 	float alt_baro;  // m
 	float alt_lidar; // m
 
-	float lat;      // °
-	float lon;      // °
-	float prev_lat; // °
-	float prev_lon; // °
+	float lat;      // Â°
+	float lon;      // Â°
+	float prev_lat; // Â°
+	float prev_lon; // Â°
 
 	uint16_t UTC_year;
 	uint8_t UTC_month;
@@ -101,25 +101,25 @@ struct state_params {
 	bool gear;  // 0 = up, 1 = down
 };
 
-struct point {
-	float maxRoll;    // °
+struct __attribute__((packed)) point {
+	float maxRoll;    // Â°
 	float minTurnRad; // m
 	float hitRadius;  // m
 
 	float alt;     // m
 	float speed;   // m/s
-	float heading; // °
-	float lat;     // °
-	float lon;     // °
+	float heading; // Â°
+	float lat;     // Â°
+	float lon;     // Â°
 
-	float rc_lat;  // Right Turn Circle lat °
-	float rc_lon;  // Right Turn Circle lon °
-	float lc_lat;  // Left Turn Circle lat °
-	float lc_lon;  // Left Turn Circle lon °
-	float c_lat;   // Selected Turn Circle lat °
-	float c_lon;   // Selected Turn Circle lon °
-	float e_lat;   // Enter/exit lat °
-	float e_lon;   // Enter/exit lon °
+	float rc_lat;  // Right Turn Circle lat Â°
+	float rc_lon;  // Right Turn Circle lon Â°
+	float lc_lat;  // Left Turn Circle lat Â°
+	float lc_lon;  // Left Turn Circle lon Â°
+	float c_lat;   // Selected Turn Circle lat Â°
+	float c_lon;   // Selected Turn Circle lon Â°
+	float e_lat;   // Enter/exit lat Â°
+	float e_lon;   // Enter/exit lon Â°
 };
 
 enum dubin {
@@ -142,7 +142,7 @@ enum nav_state {
 	DISENGAGED // Disengage dubin-styled navigation
 };
 
-struct nav_frame {
+struct __attribute__((packed)) nav_frame {
 	dubin path; // Dubin path type
 	point ni;   // Current point
 	point nf;   // Next point
